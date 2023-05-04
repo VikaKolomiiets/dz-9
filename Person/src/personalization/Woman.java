@@ -38,11 +38,19 @@ public class Woman extends Person{
 
     @Override
     public String toString() {
-        
-        Integer numberOfChilgren = this.children.size();
-        if(this.getStatus().equals(Status.IS_MARRIED)){
-            return this.getFirstName() + " " + this.getLastName() + " is married with " + this.getPartner().getFirstName() + " " + this.getPartner().getLastName();
+        StringBuilder stringBuilder = new StringBuilder(this.getFirstName() + " " + this.getLastName() + " is " + this.getFullAge() + " years old.");
+        switch ( this.getStatus() ){
+            case IS_MARRIED -> stringBuilder.append(" She is married with " + this.getPartner().getFirstName() + " " + this.getPartner().getLastName());
+            case SINGLE -> stringBuilder.append(" She is single.");
+            case IS_DIVORCED -> stringBuilder.append(" She is divorced.");
+            case WIDOWED -> stringBuilder.append(" She is widowed.");
         }
-        return this.getFirstName() + " " + this.getLastName() + " is " + this.getStatus();
+        if(this.children.size() > 0){
+            stringBuilder.append(" And she has " + this.children.size() + ".");
+        }
+        if (isRetired()){
+            stringBuilder.append(" She has been retired for " + (this.getFullAge() - RETIRED_AGE) + ".");
+        }
+        return stringBuilder.toString();
     }
 }
