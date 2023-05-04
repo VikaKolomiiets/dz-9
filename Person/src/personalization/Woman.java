@@ -1,18 +1,30 @@
 package personalization;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class Woman extends Person{
-
     private static final int RETIRED_AGE = 60;
-
 
     public Woman(String firstName, String lastName, LocalDate dateOfBirth) throws Exception {
         super(firstName, lastName, dateOfBirth);
     }
 
+    public void createFamily(Man newHusband, boolean isChangeLastName, boolean isChangeLastNameNewHusband) throws Exception {
+       createFamilyInner(newHusband, isChangeLastName, isChangeLastNameNewHusband);
+    }
+    public void giveBabyBirth(Person child) throws Exception {
+        this.addChild(child);
+        if (this.getStatus().equals(Status.IS_MARRIED)){
+            this.getPartner().addChild(child);
+            child.setLastName(this.getPartner().getLastName());
+        } else {
+            child.setLastName(this.getLastName());
+        }
+    }
+    public void adoptChild(Person child) throws Exception {
+        adoptChildInner(child);
+        child.setLastName(this.getPartner().getLastName());
+    }
     @Override
     public boolean isRetired() {
         if(getFullAge() >= RETIRED_AGE){
@@ -20,24 +32,6 @@ public class Woman extends Person{
         }
         return false;
     }
-
-    public void createFamily(Man newHusband, boolean isChangeLastName, boolean isChangeLastNameNewHusband) throws Exception {
-       createFamilyInner(newHusband, isChangeLastName, isChangeLastNameNewHusband);
-    }
-    public void giveBabyBirth(Man child){
-        this.getChildren().add(child);
-        if (this.getStatus().equals(Status.IS_MARRIED)){
-            this.getPartner().getChildren().add(child);
-        }
-    }
-    public void giveBabyBirth(Woman child){
-        this.getChildren().add(child);
-        if (this.getStatus().equals(Status.IS_MARRIED)){
-            this.getPartner().getChildren().add(child);
-        }
-    }
-
-
     @Override
     public String getFullInformation() {
         StringBuilder stringBuilder = new StringBuilder(this.getFirstName() + " " + this.getLastName() + " is " + this.getFullAge() + " years old.");
@@ -48,13 +42,12 @@ public class Woman extends Person{
             case WIDOWED -> stringBuilder.append(" She is widowed.");
         }
         if(this.getChildren().size() > 0){
-            stringBuilder.append(" And she has " + this.getChildren().size() + ".");
+            stringBuilder.append(" and she has " + this.getChildren().size() + (this.getChildren().size() == 1 ? " child.": " children."));
         }
         if (isRetired()){
-            stringBuilder.append(" She has been retired for " + (this.getFullAge() - RETIRED_AGE) + ".");
+            int period = this.getFullAge() - RETIRED_AGE;
+            stringBuilder.append(" She has been retired for " + period + (period == 1? "year": "years"));
         }
         return stringBuilder.toString();
     }
-
-
 }

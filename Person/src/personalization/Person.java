@@ -1,7 +1,5 @@
 package personalization;
-
 import java.time.LocalDate;
-
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,6 @@ public abstract class Person {
     private Status status;
     private List<Person> children;
 
-
     public Person(String firstName, String lastName, LocalDate dateOfBirth) throws Exception {
         this.checkName(firstName);
         this.checkName(lastName);
@@ -39,7 +36,7 @@ public abstract class Person {
     public abstract boolean isRetired();
     public abstract String getFullInformation();
     public int getFullAge(){
-        return (int)ChronoUnit.YEARS.between(LocalDate.now(), dateOfBirth);
+        return (int)ChronoUnit.YEARS.between(dateOfBirth, LocalDate.now());
     }
     public void divorce(boolean isBackLastName, boolean isBackLastNamePartner) throws Exception {
         if (this.getStatus() != Status.IS_MARRIED){
@@ -52,7 +49,6 @@ public abstract class Person {
         this.getPartner().setPartner(null);
         this.setPartner(null);
     }
-
     public void passAwayPartner(boolean isBackLastName) throws Exception {
         if(this.getStatus() != Status.IS_MARRIED){
             throw new Exception(this.firstName + " " + this.lastName + " doesn't hava the status 'is married'");
@@ -64,7 +60,6 @@ public abstract class Person {
         this.setPartner(null);
         backToBirthLastName(isBackLastName);
     }
-
     private void backToBirthLastName(boolean isBack) throws Exception {
         if (isBack && (!this.getLastName().equals(this.getBirthLastName()))){
             this.setLastName(this.getBirthLastName());
@@ -75,7 +70,13 @@ public abstract class Person {
             this.getPartner().setLastName(this.getPartner().getBirthLastName());
         }
     }
-
+    protected void adoptChildInner(Person child) throws Exception {
+        if (!this.getStatus().equals(Status.IS_MARRIED)) {
+            throw new Exception("Status have to be 'Married' for adopting child");
+        }
+        this.addChild(child);
+        this.getPartner().addChild(child);
+    }
     protected void createFamilyInner(Person newPartner, boolean isChangeLastName, boolean isChangeLastNameNewPartner) throws Exception {
         if (newPartner == null){
             throw new Exception("Partner cannot be a null");
@@ -96,12 +97,11 @@ public abstract class Person {
             newPartner.setLastName(this.getLastName());
         }
     }
-
     protected void addChild(Person child) throws Exception {
         if (child == null){
             throw new Exception("Child can not be a null");
         }
-        if((int)ChronoUnit.YEARS.between(child.dateOfBirth, this.dateOfBirth) < MIN_YEARS_BETWEEN_PARENT_CHILD){
+        if((int)ChronoUnit.YEARS.between(this.dateOfBirth, child.dateOfBirth) <= MIN_YEARS_BETWEEN_PARENT_CHILD){
             throw new Exception("Parent have to be older than child on 12 years");
         }
         this.children.add(child);
