@@ -27,7 +27,7 @@ public abstract class Person {
         return (int)ChronoUnit.YEARS.between(LocalDate.now(), dateOfBirth);
     }
 
-    public abstract void isRetired();
+    public abstract boolean isRetired();
 
     private void checkName(String name) throws Exception {
         if (name == null) {
@@ -46,34 +46,29 @@ public abstract class Person {
             throw new Exception("Date of Birth is out of the range of dates");
         }
     }
+
     //region Getter&Setter
     public String getFirstName() {
         return this.firstName;
     }
-
     public void setFirstName(String firstName) throws Exception {
         this.checkName(firstName);
         this.firstName = firstName;
     }
-
     public String getLastName() {
         return this.lastName;
     }
-
     public void setLastName(String lastName) throws Exception {
         this.checkName(lastName);
         this.lastName = lastName;
     }
-
     public LocalDate getDateOfBirth() {
         return this.dateOfBirth;
     }
-
     public void setDateOfBirth(LocalDate dateOfBirth) throws Exception {
         this.checkDate(dateOfBirth);
         this.dateOfBirth = dateOfBirth;
     }
-
     public UUID getId() {
         return this.id;
     }
