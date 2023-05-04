@@ -1,17 +1,17 @@
 package personalization;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public abstract class Person {
-    private final Date MIN_DATE = new Date(1900, 01, 01);
-    private final Date MAX_DATE = new Date(2023, 05, 04);
+    private final LocalDate MIN_DATE = LocalDate.of(1900, 01, 01);
+    private LocalDate maxDate = LocalDate.now();
     private UUID id;
     private String firstName;
     private String lastName;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
-    public Person(String firstName, String lastName, Date dateOfBirth) throws Exception {
+    public Person(String firstName, String lastName, LocalDate dateOfBirth) throws Exception {
         if (firstName == null || firstName.length() < 2) {
             throw new Exception("Name cannot be a null, or it length have to contain more than 1 letter.");
         }
@@ -21,15 +21,14 @@ public abstract class Person {
         if (dateOfBirth == null){
             throw new Exception("Date of Birth can not be a null");
         }
-
-        if (dateOfBirth.before(MIN_DATE) || dateOfBirth.after(MAX_DATE)){
-             throw new Exception("Date of Birth is out of DateTime range");
+        if (dateOfBirth.isBefore(MIN_DATE) || dateOfBirth.isAfter(maxDate)){
+             throw new Exception("Date of Birth is out of the date range");
         }
         this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
-
     }
-
+    public abstract int getFullAge();
+    public abstract void isRetired();
 }
