@@ -9,7 +9,6 @@ public abstract class Person {
     private static final LocalDate MIN_DATE = LocalDate.of(1900, 01, 01);
     private final String BIRTH_LAST_NAME;
     private final int MIN_YEARS_BETWEEN_PARENT_CHILD = 12;
-    private LocalDate maxDate = LocalDate.now();
     private UUID id;
     private String firstName;
     private String lastName;
@@ -42,45 +41,38 @@ public abstract class Person {
             return (int)ChronoUnit.YEARS.between(dateOfBirth, dateOfDeath);
         }
     }
+
+    //todo create function revert
     public void divorce(boolean isBackLastName, boolean isBackLastNamePartner) throws Exception {
         if (this.getStatus() != Status.IS_MARRIED){
             throw new Exception(this.firstName + " " + this.lastName + " doesn't hava the status 'is married'");
         }
         this.getPartner().setStatus(Status.IS_DIVORCED);
         this.setStatus(Status.IS_DIVORCED);
-        backToBirthLastName(isBackLastName);
-        backPartnerToBirthLastName(isBackLastNamePartner);
+        if(isBackLastNamePartner) {
+            backToBirthLastName(this.getPartner());
+        }
+        if(isBackLastName) {
+            backToBirthLastName(this);
+        }
+
         this.getPartner().setPartner(null);
         this.setPartner(null);
     }
-    public void passAwayPartner(boolean isBackLastName) throws Exception {
+    public void passAway(LocalDate dateOfDeath) throws Exception {
+        this.checkDate(dateOfDeath);
+        if(getDateOfBirth().isBefore(dateOfDeath)){
+            throw new Exception("Date of Death out of range");
+        }
+        this.setDateOfDeath(dateOfDeath);
         if(this.getStatus() != Status.IS_MARRIED){
-            throw new Exception(this.firstName + " " + this.lastName + " doesn't hava the status 'is married'");
+            return;
         }
-        if (this.getPartner().getDateOfDeath() == null){
-            throw new Exception("The death of " + this.getPartner().getFirstName() + " " + this.getPartner().getLastName() + "is not recorded in DataBase" );
-        }
-        this.setStatus(Status.WIDOWED);
+        this.partner.setStatus(Status.WIDOWED);
         this.setPartner(null);
-        backToBirthLastName(isBackLastName);
+        this.partner.setPartner(null);
     }
-    private void backToBirthLastName(boolean isBack) throws Exception {
-        if (isBack && (!this.getLastName().equals(this.getBirthLastName()))){
-            this.setLastName(this.getBirthLastName());
-        }
-    }
-    private void backPartnerToBirthLastName(boolean isBack) throws Exception {
-        if(isBack && (!this.getPartner().getBirthLastName().equals(this.getPartner().getLastName()))){
-            this.getPartner().setLastName(this.getPartner().getBirthLastName());
-        }
-    }
-    protected void adoptChildInner(Person child) throws Exception {
-        if (!this.getStatus().equals(Status.IS_MARRIED)) {
-            throw new Exception("Status have to be 'Married' for adopting child");
-        }
-        this.addChild(child);
-        this.getPartner().addChild(child);
-    }
+
     protected void createFamilyInner(Person newPartner, boolean isChangeLastName, boolean isChangeLastNameNewPartner) throws Exception {
         if (newPartner == null){
             throw new Exception("Partner cannot be a null");
@@ -88,7 +80,7 @@ public abstract class Person {
         checkMarried(this);
         checkMarried(newPartner);
         if (isChangeLastName && isChangeLastNameNewPartner) {
-            throw new Exception("The Last name can be changed for both partners at one time");
+            throw new Exception("The Last name cannot be changed for both partners at one time");
         }
         this.setStatus(Status.IS_MARRIED);
         newPartner.setStatus(Status.IS_MARRIED);
@@ -101,6 +93,14 @@ public abstract class Person {
             newPartner.setLastName(this.getLastName());
         }
     }
+    protected void adoptChildInner(Person child) throws Exception {
+        if (!this.getStatus().equals(Status.IS_MARRIED)) {
+            throw new Exception("Status have to be 'Married' for adopting child");
+        }
+        //todo make check child to age for both parents
+        this.addChild(child);
+        this.getPartner().addChild(child);
+    }
     protected void addChild(Person child) throws Exception {
         if (child == null){
             throw new Exception("Child can not be a null");
@@ -110,7 +110,8 @@ public abstract class Person {
         }
         this.children.add(child);
     }
-    protected void checkMarried(Person person) throws Exception {
+
+    private void checkMarried(Person person) throws Exception {
         if (person.getStatus() == Status.IS_MARRIED){
             throw new Exception(person.getFirstName() + " " + person.getLastName() +" can not married twice!");
         }
@@ -127,12 +128,20 @@ public abstract class Person {
         if (date == null){
             throw new Exception("Date of Birth can not be a null");
         }
-        if (date.isBefore(MIN_DATE) || date.isAfter(maxDate)){
+        if (date.isBefore(MIN_DATE) || date.isAfter(LocalDate.now())){
             throw new Exception("Date of Birth is out of the range of dates");
+        }
+    }
+    private void backToBirthLastName(Person person) throws Exception {
+        if ((!person.getLastName().equals(person.getBirthLastName()))){
+            person.setLastName(person.getBirthLastName());
         }
     }
 
     //region Getter&Setter
+    public UUID getId() {
+        return this.id;
+    }
     public String getFirstName() {
         return this.firstName;
     }
@@ -153,23 +162,8 @@ public abstract class Person {
     public LocalDate getDateOfBirth() {
         return this.dateOfBirth;
     }
-    public void setDateOfBirth(LocalDate dateOfBirth) throws Exception {
-        this.checkDate(dateOfBirth);
-        this.dateOfBirth = dateOfBirth;
-    }
     public LocalDate getDateOfDeath() {
         return dateOfDeath;
-    }
-// How to inform the Partner about Death and switch their status?
-    public void setDateOfDeath(LocalDate dateOfDeath) throws Exception {
-        this.checkDate(dateOfDeath);
-        this.dateOfDeath = dateOfDeath;
-    }
-    public UUID getId() {
-        return this.id;
-    }
-    public List<Person> getChildren() {
-        return children;
     }
     public Person getPartner() {
         return this.partner;
@@ -183,9 +177,11 @@ public abstract class Person {
     protected void setStatus(Status status) {
         this.status = status;
     }
-
-
-
-//endregion
-
+    protected void setDateOfDeath(LocalDate dateOfDeath) {
+        this.dateOfDeath = dateOfDeath;
+    }
+    protected List<Person> getChildren() {
+        return children;
+    }
+    //endregion
 }

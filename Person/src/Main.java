@@ -21,8 +21,7 @@ public class Main {
         System.out.println(nik.getFullInformation());
         System.out.println(kate.getFullInformation());
         System.out.println(georg.getFullInformation());
-        nik.setDateOfDeath(LocalDate.of(2022, 12,01));
-        ann.passAwayPartner(true);
+        nik.passAway(LocalDate.of(2022, 12,01));
         System.out.println(ann.getFullInformation());
         System.out.println(nik.getFullInformation());
     }

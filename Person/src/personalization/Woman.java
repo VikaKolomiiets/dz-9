@@ -8,7 +8,6 @@ public class Woman extends Person{
     public Woman(String firstName, String lastName, LocalDate dateOfBirth) throws Exception {
         super(firstName, lastName, dateOfBirth);
     }
-
     public void createFamily(Man newHusband, boolean isChangeLastName, boolean isChangeLastNameNewHusband) throws Exception {
        createFamilyInner(newHusband, isChangeLastName, isChangeLastNameNewHusband);
     }
