@@ -11,7 +11,10 @@ public abstract class Person {
     private UUID id;
     private String firstName;
     private String lastName;
+    private final String BIRTH_LAST_NAME;
     private LocalDate dateOfBirth;
+    private Person partner;
+    private Status status;
 
 
     public Person(String firstName, String lastName, LocalDate dateOfBirth) throws Exception {
@@ -21,13 +24,42 @@ public abstract class Person {
         this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
+        this.BIRTH_LAST_NAME = lastName;
         this.dateOfBirth = dateOfBirth;
+        this.partner = null;
+        this.status = Status.SINGLE;
     }
     public int getFullAge(){
         return (int)ChronoUnit.YEARS.between(LocalDate.now(), dateOfBirth);
     }
 
+    protected void createFamilyInner(Person newPartner, boolean isChangeLastName, boolean isChangeLastNameNewPartner) throws Exception {
+        if (newPartner == null){
+            throw new Exception("Partner cannot be a null");
+        }
+        checkMarried(this);
+        checkMarried(newPartner);
+        this.setStatus(Status.IS_MARRIED);
+        newPartner.setStatus(Status.IS_MARRIED);
+
+        if (isChangeLastName && isChangeLastNameNewPartner) {
+            throw new Exception("The Last name can be changed for both partners at one time");
+        }
+
+        if (isChangeLastName) {
+            this.setLastName(newPartner.getLastName());
+        }
+        if (isChangeLastNameNewPartner){
+            newPartner.setLastName(this.getLastName());
+        }
+    }
+
     public abstract boolean isRetired();
+    protected void checkMarried(Person person) throws Exception {
+        if (person.getStatus() == Status.IS_MARRIED){
+            throw new Exception(person.getFirstName() + " " + person.getLastName() +" can not married twice!");
+        }
+    }
 
     private void checkName(String name) throws Exception {
         if (name == null) {
@@ -62,6 +94,10 @@ public abstract class Person {
         this.checkName(lastName);
         this.lastName = lastName;
     }
+
+    public String getBirthLastName() {
+        return BIRTH_LAST_NAME;
+    }
     public LocalDate getDateOfBirth() {
         return this.dateOfBirth;
     }
@@ -72,6 +108,24 @@ public abstract class Person {
     public UUID getId() {
         return this.id;
     }
+
+
+    public Person getPartner() {
+        return this.partner;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    protected void setPartner(Person partner) {
+        this.partner = partner;
+    }
+
+    protected void setStatus(Status status) {
+        this.status = status;
+    }
+
     //endregion
 
 }

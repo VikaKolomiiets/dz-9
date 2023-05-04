@@ -16,4 +16,10 @@ public class Woman extends Person{
         }
         return false;
     }
+
+
+    public void createFamily(Man newHusband, boolean isChangeLastName, boolean isChangeLastNameNewHusband) throws Exception {
+       createFamilyInner(newHusband, isChangeLastName, isChangeLastNameNewHusband);
+    }
+
 }
