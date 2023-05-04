@@ -10,11 +10,7 @@ public class Man extends Person{
 
     public Man(String firstName, String lastName, LocalDate dateOfBirth) throws Exception {
         super(firstName, lastName, dateOfBirth);
-
-
     }
-
-
 
     @Override
     public boolean isRetired() {
@@ -22,5 +18,9 @@ public class Man extends Person{
             return true;
         }
         return false;
+    }
+
+    public void createFamily(Woman newWife, boolean isChangeLastName, boolean isChangeLastNameNewWife) throws Exception {
+        createFamilyInner(newWife, isChangeLastName, isChangeLastNameNewWife);
     }
 }

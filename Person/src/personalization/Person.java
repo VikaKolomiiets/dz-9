@@ -13,6 +13,7 @@ public abstract class Person {
     private String lastName;
     private final String BIRTH_LAST_NAME;
     private LocalDate dateOfBirth;
+    private LocalDate dateOfDeath;
     private Person partner;
     private Status status;
 
@@ -28,9 +29,45 @@ public abstract class Person {
         this.dateOfBirth = dateOfBirth;
         this.partner = null;
         this.status = Status.SINGLE;
+        this.dateOfDeath = null;
     }
+    public abstract boolean isRetired();
     public int getFullAge(){
         return (int)ChronoUnit.YEARS.between(LocalDate.now(), dateOfBirth);
+    }
+    public void divorce(boolean isBackLastName, boolean isBackLastNamePartner) throws Exception {
+        if (this.getStatus() != Status.IS_MARRIED){
+            throw new Exception(this.firstName + " " + this.lastName + " doesn't hava the status 'is married'");
+        }
+        this.getPartner().setStatus(Status.IS_DIVORCED);
+        this.setStatus(Status.IS_DIVORCED);
+        backToBirthLastName(isBackLastName);
+        backPartnerToBirthLastName(isBackLastNamePartner);
+        this.getPartner().setPartner(null);
+        this.setPartner(null);
+    }
+
+    public void passAwayPartner(boolean isBackLastName) throws Exception {
+        if(this.getStatus() != Status.IS_MARRIED){
+            throw new Exception(this.firstName + " " + this.lastName + " doesn't hava the status 'is married'");
+        }
+        if (this.getPartner().getDateOfDeath() == null){
+            throw new Exception("The death of " + this.getPartner().getFirstName() + " " + this.getPartner().getLastName() + "is not recorded in DataBase" );
+        }
+        this.setStatus(Status.WIDOWED);
+        this.setPartner(null);
+        backToBirthLastName(isBackLastName);
+    }
+
+    private void backToBirthLastName(boolean isBack) throws Exception {
+        if (isBack && this.getLastName() != this.getBirthLastName()){
+            this.setLastName(this.getBirthLastName());
+        }
+    }
+    private void backPartnerToBirthLastName(boolean isBack) throws Exception {
+        if(isBack && this.getPartner().getBirthLastName() != this.getPartner().getLastName()){
+            this.getPartner().setLastName(this.getPartner().getBirthLastName());
+        }
     }
 
     protected void createFamilyInner(Person newPartner, boolean isChangeLastName, boolean isChangeLastNameNewPartner) throws Exception {
@@ -39,13 +76,13 @@ public abstract class Person {
         }
         checkMarried(this);
         checkMarried(newPartner);
-        this.setStatus(Status.IS_MARRIED);
-        newPartner.setStatus(Status.IS_MARRIED);
-
         if (isChangeLastName && isChangeLastNameNewPartner) {
             throw new Exception("The Last name can be changed for both partners at one time");
         }
-
+        this.setStatus(Status.IS_MARRIED);
+        newPartner.setStatus(Status.IS_MARRIED);
+        this.setPartner(newPartner);
+        newPartner.setPartner(this);
         if (isChangeLastName) {
             this.setLastName(newPartner.getLastName());
         }
@@ -54,7 +91,8 @@ public abstract class Person {
         }
     }
 
-    public abstract boolean isRetired();
+
+
     protected void checkMarried(Person person) throws Exception {
         if (person.getStatus() == Status.IS_MARRIED){
             throw new Exception(person.getFirstName() + " " + person.getLastName() +" can not married twice!");
@@ -105,10 +143,19 @@ public abstract class Person {
         this.checkDate(dateOfBirth);
         this.dateOfBirth = dateOfBirth;
     }
+
+    public LocalDate getDateOfDeath() {
+        return dateOfDeath;
+    }
+// How to inform the Partner about Death and switch their status?
+    public void setDateOfDeath(LocalDate dateOfDeath) throws Exception {
+        this.checkDate(dateOfDeath);
+        this.dateOfDeath = dateOfDeath;
+    }
+
     public UUID getId() {
         return this.id;
     }
-
 
     public Person getPartner() {
         return this.partner;
