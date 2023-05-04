@@ -3,19 +3,23 @@ package personalization;
 import java.time.LocalDate;
 
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public abstract class Person {
     private static final LocalDate MIN_DATE = LocalDate.of(1900, 01, 01);
+    private final String BIRTH_LAST_NAME;
+    private final int MIN_YEARS_BETWEEN_PARENT_CHILD = 12;
     private LocalDate maxDate = LocalDate.now();
     private UUID id;
     private String firstName;
     private String lastName;
-    private final String BIRTH_LAST_NAME;
     private LocalDate dateOfBirth;
     private LocalDate dateOfDeath;
     private Person partner;
     private Status status;
+    private List<Person> children;
 
 
     public Person(String firstName, String lastName, LocalDate dateOfBirth) throws Exception {
@@ -30,8 +34,10 @@ public abstract class Person {
         this.partner = null;
         this.status = Status.SINGLE;
         this.dateOfDeath = null;
+        children = new ArrayList<>();
     }
     public abstract boolean isRetired();
+    public abstract String getFullInformation();
     public int getFullAge(){
         return (int)ChronoUnit.YEARS.between(LocalDate.now(), dateOfBirth);
     }
@@ -60,12 +66,12 @@ public abstract class Person {
     }
 
     private void backToBirthLastName(boolean isBack) throws Exception {
-        if (isBack && this.getLastName() != this.getBirthLastName()){
+        if (isBack && (!this.getLastName().equals(this.getBirthLastName()))){
             this.setLastName(this.getBirthLastName());
         }
     }
     private void backPartnerToBirthLastName(boolean isBack) throws Exception {
-        if(isBack && this.getPartner().getBirthLastName() != this.getPartner().getLastName()){
+        if(isBack && (!this.getPartner().getBirthLastName().equals(this.getPartner().getLastName()))){
             this.getPartner().setLastName(this.getPartner().getBirthLastName());
         }
     }
@@ -91,14 +97,20 @@ public abstract class Person {
         }
     }
 
-
-
+    protected void addChild(Person child) throws Exception {
+        if (child == null){
+            throw new Exception("Child can not be a null");
+        }
+        if((int)ChronoUnit.YEARS.between(child.dateOfBirth, this.dateOfBirth) < MIN_YEARS_BETWEEN_PARENT_CHILD){
+            throw new Exception("Parent have to be older than child on 12 years");
+        }
+        this.children.add(child);
+    }
     protected void checkMarried(Person person) throws Exception {
         if (person.getStatus() == Status.IS_MARRIED){
             throw new Exception(person.getFirstName() + " " + person.getLastName() +" can not married twice!");
         }
     }
-
     private void checkName(String name) throws Exception {
         if (name == null) {
             throw new Exception("Name cannot be a null.");
@@ -107,7 +119,6 @@ public abstract class Person {
             throw new Exception("Name length have to contain more than one letter.");
         }
     }
-
     private void checkDate(LocalDate date) throws Exception {
         if (date == null){
             throw new Exception("Date of Birth can not be a null");
@@ -132,7 +143,6 @@ public abstract class Person {
         this.checkName(lastName);
         this.lastName = lastName;
     }
-
     public String getBirthLastName() {
         return BIRTH_LAST_NAME;
     }
@@ -143,7 +153,6 @@ public abstract class Person {
         this.checkDate(dateOfBirth);
         this.dateOfBirth = dateOfBirth;
     }
-
     public LocalDate getDateOfDeath() {
         return dateOfDeath;
     }
@@ -152,27 +161,27 @@ public abstract class Person {
         this.checkDate(dateOfDeath);
         this.dateOfDeath = dateOfDeath;
     }
-
     public UUID getId() {
         return this.id;
     }
-
+    public List<Person> getChildren() {
+        return children;
+    }
     public Person getPartner() {
         return this.partner;
     }
-
     public Status getStatus() {
         return status;
     }
-
     protected void setPartner(Person partner) {
         this.partner = partner;
     }
-
     protected void setStatus(Status status) {
         this.status = status;
     }
 
-    //endregion
+
+
+//endregion
 
 }
