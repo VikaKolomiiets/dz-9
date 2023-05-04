@@ -46,7 +46,7 @@ public class Woman extends Person{
         }
         if (isRetired()){
             int period = this.getFullAge() - RETIRED_AGE;
-            stringBuilder.append(" She has been retired for " + period + (period == 1? "year": "years"));
+            stringBuilder.append(" She has been retired for " + period + (period == 1? " year": " years"));
         }
         return stringBuilder.toString();
     }

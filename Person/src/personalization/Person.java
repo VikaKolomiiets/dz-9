@@ -36,7 +36,11 @@ public abstract class Person {
     public abstract boolean isRetired();
     public abstract String getFullInformation();
     public int getFullAge(){
-        return (int)ChronoUnit.YEARS.between(dateOfBirth, LocalDate.now());
+        if (this.getDateOfDeath() == null){
+            return (int)ChronoUnit.YEARS.between(dateOfBirth, LocalDate.now());
+        } else {
+            return (int)ChronoUnit.YEARS.between(dateOfBirth, dateOfDeath);
+        }
     }
     public void divorce(boolean isBackLastName, boolean isBackLastNamePartner) throws Exception {
         if (this.getStatus() != Status.IS_MARRIED){
