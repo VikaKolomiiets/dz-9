@@ -59,7 +59,6 @@ public abstract class Person {
         this.getPartner().setPartner(null);
         this.setPartner(null);
     }
-
     public void passAway(LocalDate dateOfDeath) throws Exception {
         this.checkDate(dateOfDeath);
         if(getDateOfBirth().isAfter(dateOfDeath)){
@@ -118,7 +117,6 @@ public abstract class Person {
             throw new Exception("This Person is dead!");
         }
     }
-
     private void checkMarried(Person person) throws Exception {
         if (person.getStatus().equals(Status.IS_MARRIED)){
             throw new Exception(person.getFirstName() + " " + person.getLastName() +" can not married twice!");

@@ -1,28 +1,29 @@
 import personalization.Man;
-import personalization.Person;
 import personalization.Woman;
-
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Locale;
+
 
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Woman ann = new Woman("Ann", "Kingtom", LocalDate.of(1965, 12, 01));
-        Woman kate = new Woman("Kate", "LastName", LocalDate.of(1982, 01, 28));
-        Man nik = new Man("Nikola", "Bange", LocalDate.of(1949, 07, 01));
-        Man georg = new Man("George", "LastName", LocalDate.of(1992, 01, 01));
-        nik.createFamily( ann, false, true);
+        Woman ann = new Woman("Ann", "Kingtom", LocalDate.of(1955, 12, 01));
+        Woman kate = new Woman("Kate", "Bange", LocalDate.of(1972, 01, 28));
+        Man miki = new Man("Nikola", "Bange", LocalDate.of(1949, 07, 01));
+        Man georg = new Man("George", "Bange", LocalDate.of(1982, 01, 01));
+        Woman zita = new Woman("Zita", "Osnovatkay", LocalDate.of(1998, 12, 05));
+        System.out.println(zita.getFullInformation());
+        zita.createFamily(georg, true, false);
+        System.out.println(zita.getFullInformation());
+        miki.createFamily( ann, false, true);
         ann.giveBabyBirth(kate);
-        nik.adoptChild(georg);
-        //ann.passAwayPartner(true);
+        miki.adoptChild(georg);
+        georg.divorce(false, true);
+        System.out.println(zita.getFullInformation());
+        miki.passAway(LocalDate.of(2020, 10, 15));
         System.out.println(ann.getFullInformation());
-        System.out.println(nik.getFullInformation());
+        System.out.println(miki.getFullInformation());
         System.out.println(kate.getFullInformation());
         System.out.println(georg.getFullInformation());
-        nik.passAway(LocalDate.of(2022, 12,01));
-        System.out.println(ann.getFullInformation());
-        System.out.println(nik.getFullInformation());
+
     }
 }
