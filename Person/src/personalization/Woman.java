@@ -1,9 +1,13 @@
 package personalization;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 
 public class Woman extends Person{
     private static final int RETIRED_AGE = 60;
+
+    private final int MIN_YEARS_BETWEEN_PARENT_CHILD = 12;
+
 
     public Woman(String firstName, String lastName, LocalDate dateOfBirth) throws Exception {
         super(firstName, lastName, dateOfBirth);
@@ -13,6 +17,9 @@ public class Woman extends Person{
     }
     public void giveBabyBirth(Person child) throws Exception {
         this.addChild(child);
+        if((int) ChronoUnit.YEARS.between(this.getDateOfBirth(), child.getDateOfBirth()) <= MIN_YEARS_BETWEEN_PARENT_CHILD){
+            throw new Exception("Parent have to be older than child on 12 years");
+        }
         if (this.getStatus().equals(Status.IS_MARRIED)){
             this.getPartner().addChild(child);
             child.setLastName(this.getPartner().getLastName());
